@@ -19,14 +19,16 @@ export default function Navigation() {
                                 DBreaker
                             </Link>
                         </div>
-                        <div className="hidden sm:ml-6 sm:flex sm:space-x-4 items-center space-x-4">
-                            <Link
-                                href="/game"
-                                className="text-zinc-300 hover:text-zinc-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                            >
-                                Game
-                            </Link>
-                        </div>
+                        {session && (
+                            <div className="hidden sm:ml-6 sm:flex sm:space-x-4 items-center space-x-4">
+                                <Link
+                                    href="/game"
+                                    className="text-zinc-300 hover:text-zinc-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    Game
+                                </Link>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center">
                         {session ? (

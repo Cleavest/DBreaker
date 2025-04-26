@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useSession } from 'next-auth/react';
 
-// Dynamically import Monaco Editor to avoid SSR issues
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
     ssr: false,
 });
 
-// Interface for the level data
 interface LevelData {
     id: number;
     name: string;
@@ -20,6 +19,7 @@ interface LevelData {
 export default function GameLevelPage() {
     const params = useParams();
     const router = useRouter();
+    const { data: session, status } = useSession();
     const levelId = params.id as string;
 
     const [level, setLevel] = useState<LevelData | null>(null);
@@ -33,35 +33,39 @@ export default function GameLevelPage() {
         Array<{ pattern: string; hint: string }>
     >([]);
 
-    // Fetch level data when component mounts or levelId changes
     useEffect(() => {
-        const fetchLevel = async () => {
-            if (!levelId) return;
+        if (status === 'unauthenticated') {
+            router.push('/login');
+        }
+    }, [status, router]);
 
-            setLoading(true);
-            try {
-                // Fetch level data from API
-                const response = await fetch(`/api/levels/${levelId}`);
+    useEffect(() => {
+        if (status === 'authenticated' && levelId) {
+            const fetchLevel = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch(`/api/levels/${levelId}`);
 
-                if (!response.ok) {
-                    throw new Error(
-                        `Failed to fetch level: ${response.status}`
-                    );
+                    if (!response.ok) {
+                        throw new Error(
+                            `Failed to fetch level: ${response.status}`
+                        );
+                    }
+
+                    const data = await response.json();
+                    setLevel(data);
+                    setTextPages(data.description.split('|||'));
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching level:', error);
+                    setError('Failed to load level data');
+                    setLoading(false);
                 }
+            };
 
-                const data = await response.json();
-                setLevel(data);
-                setTextPages(data.description.split('|||'));
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching level:', error);
-                setError('Failed to load level data');
-                setLoading(false);
-            }
-        };
-
-        fetchLevel();
-    }, [levelId]);
+            fetchLevel();
+        }
+    }, [levelId, status]);
 
     const goToPrevious = () => {
         setCurrentTextIndex((prev) => (prev > 0 ? prev - 1 : prev));
@@ -73,16 +77,13 @@ export default function GameLevelPage() {
         );
     };
 
-    // Function to check if the user's query matches the expected solution
     const checkSolution = async () => {
         if (!level) return;
 
-        // Clear previous results and hints
         setQueryResults([]);
         setHints([]);
 
         try {
-            // Execute the query through our API
             const response = await fetch('/api/execute-query', {
                 method: 'POST',
                 headers: {
@@ -98,7 +99,6 @@ export default function GameLevelPage() {
                 const errorData = await response.json();
                 console.error('Error executing query:', errorData);
 
-                // Display hints if available
                 if (errorData.hints && errorData.hints.length > 0) {
                     setHints(errorData.hints);
                 }
@@ -111,24 +111,33 @@ export default function GameLevelPage() {
 
             const data = await response.json();
 
-            // Set the results
             setQueryResults(data.results || []);
 
-            // Show hints if query is not correct
             if (!data.isCorrect && data.hints && data.hints.length > 0) {
                 setHints(data.hints);
             }
 
-            // Check if correct
             if (data.isCorrect) {
                 console.log('Correct solution!');
-                // Here you could update user progress, show a success message, etc.
             }
         } catch (error) {
             console.error('Error checking solution:', error);
             setQueryResults([{ error: 'Failed to execute query' }]);
         }
     };
+
+    // Show loading state while checking authentication
+    if (status === 'loading' || status === 'unauthenticated') {
+        return (
+            <div className="min-h-screen bg-zinc-950 p-8 flex justify-center items-center">
+                <div className="animate-pulse text-zinc-400">
+                    {status === 'loading'
+                        ? 'Loading...'
+                        : 'Redirecting to login...'}
+                </div>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
