@@ -5,10 +5,9 @@ const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
     try {
-        // Get the ID from the URL path
         const url = new URL(request.url);
         const pathParts = url.pathname.split('/');
-        const id = pathParts[pathParts.length - 1]; // The last part of the path is the ID
+        const id = pathParts[pathParts.length - 1];
 
         const levelId = parseInt(id);
 
@@ -19,7 +18,6 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Fetch the level from the database
         const level = await prisma.level.findUnique({
             where: { id: levelId },
         });
