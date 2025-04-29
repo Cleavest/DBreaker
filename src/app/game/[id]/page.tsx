@@ -1,9 +1,11 @@
 'use client';
-
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
+import master from '@/svg/SQLmaster.svg';
+import SchemaViewer from '@/components/SchemaViewer';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
     ssr: false,
@@ -129,7 +131,7 @@ export default function GameLevelPage() {
     // Show loading state while checking authentication
     if (status === 'loading' || status === 'unauthenticated') {
         return (
-            <div className="min-h-screen bg-zinc-950 p-8 flex justify-center items-center">
+            <div className=" bg-zinc-950 p-8 flex justify-center items-center">
                 <div className="animate-pulse text-zinc-400">
                     {status === 'loading'
                         ? 'Loading...'
@@ -141,7 +143,7 @@ export default function GameLevelPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 p-8 flex justify-center items-center">
+            <div className=" bg-zinc-950 p-8 flex justify-center items-center">
                 <div className="animate-pulse text-zinc-400">
                     Loading level {levelId}...
                 </div>
@@ -151,7 +153,7 @@ export default function GameLevelPage() {
 
     if (error || !level) {
         return (
-            <div className="min-h-screen bg-zinc-950 p-8 flex flex-col justify-center items-center">
+            <div className=" bg-zinc-950 p-8 flex flex-col justify-center items-center">
                 <div className="text-red-400 mb-4">
                     {error || 'Level not found'}
                 </div>
@@ -166,7 +168,7 @@ export default function GameLevelPage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 p-8">
+        <div className="container mx-auto mt-12">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold text-zinc-100">
@@ -184,7 +186,7 @@ export default function GameLevelPage() {
                     {/* Character Section */}
                     <div className="lg:col-span-1 bg-zinc-900 rounded-lg p-6 border border-zinc-800">
                         <div className="flex flex-col items-center">
-                            <div className="w-32 h-32 bg-zinc-800 rounded-full mb-4"></div>
+                            <Image className='w-[140px] h-full object-cover mb-4' alt="Close Icon" src={master}/>
                             <div className="text-zinc-200 text-center">
                                 <h3 className="text-xl font-bold mb-2">
                                     SQL Master
@@ -196,11 +198,10 @@ export default function GameLevelPage() {
                                     <button
                                         onClick={goToPrevious}
                                         disabled={currentTextIndex === 0}
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                            currentTextIndex === 0
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${currentTextIndex === 0
                                                 ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
                                                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 hover:border-zinc-600'
-                                        }`}
+                                            }`}
                                     >
                                         &larr; Back
                                     </button>
@@ -210,12 +211,11 @@ export default function GameLevelPage() {
                                             currentTextIndex ===
                                             textPages.length - 1
                                         }
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                            currentTextIndex ===
-                                            textPages.length - 1
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${currentTextIndex ===
+                                                textPages.length - 1
                                                 ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
                                                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 hover:border-zinc-600'
-                                        }`}
+                                            }`}
                                     >
                                         Next &rarr;
                                     </button>
@@ -284,6 +284,8 @@ export default function GameLevelPage() {
                             </div>
                         )}
 
+                        {/* Table Example */}
+                        <SchemaViewer></SchemaViewer>
                         {/* Results Section */}
                         <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
                             <h3 className="text-zinc-200 font-bold mb-2">

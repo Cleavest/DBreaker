@@ -33,7 +33,7 @@ export default function Navigation() {
                     <div className="flex items-center">
                         {session ? (
                             <div className="flex items-center space-x-4">
-                                <span className="text-zinc-300">
+                                <span className="text-zinc-300 hidden sm:block">
                                     Welcome,{' '}
                                     <span className="text-zinc-200">
                                         {session.user?.name}

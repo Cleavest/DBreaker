@@ -20,7 +20,12 @@
 }
 
 body {
-    background: var(--background);
+    /* background: var(--background); */
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+}
+
+.swiper-slide-thumb-active.table-thumb{
+    @apply pointer-events-none bg-[radial-gradient(ellipse_100%_100%_at_-20%_0%,rgba(120,79,255,0.3),rgba(9,9,11,0.8))];
 }

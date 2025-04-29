@@ -27,11 +27,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,79,255,0.1),rgba(255,255,255,0))]`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-950 bg-[radial-gradient(ellipse_80%_90%_at_50%_-20%,rgba(120,79,255,0.1),rgba(255,255,255,0))]`}
             >
                 <AuthProvider>
                     <Navigation />
-                    <main className="min-h-screen">{children}</main>
+                    <main>{children}</main>
                 </AuthProvider>
             </body>
         </html>

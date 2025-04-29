@@ -23,7 +23,8 @@
         "next": "15.3.1",
         "next-auth": "^4.24.11",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "swiper": "^11.2.6"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",
@@ -32,7 +33,7 @@
         "@types/react-dom": "^19",
         "prisma": "^6.6.0",
         "tailwindcss": "^4",
-        "typescript": "^5",
-        "ts-node": "^10.9.2"
+        "ts-node": "^10.9.2",
+        "typescript": "^5"
     }
 }
