@@ -43,18 +43,30 @@ function validateSelectQuery(query: string): {
         }
     }
 
-    // Extract table name from SELECT query
-    const tableMatch = upperQuery.match(/FROM\s+(\w+)/);
-    if (!tableMatch) {
+    // Extract all table names from the query
+    const tableMatches = upperQuery.match(
+        /FROM\s+(\w+)(?:\s+(?:AS\s+\w+)?(?:\s*,\s*(\w+)(?:\s+(?:AS\s+\w+)?)?)*)?/g
+    );
+    if (!tableMatches) {
         return { isValid: false, error: 'Invalid SELECT query format' };
     }
 
-    const tableName = tableMatch[1].toLowerCase();
-    if (!ALLOWED_TABLES.includes(tableName)) {
-        return {
-            isValid: false,
-            error: 'Table not allowed for SELECT operations',
-        };
+    // Check each table in the query
+    for (const match of tableMatches) {
+        const tables = match
+            .replace('FROM', '')
+            .trim()
+            .split(/\s*,\s*/);
+        for (const table of tables) {
+            // Remove any alias
+            const tableName = table.split(/\s+/)[0].toLowerCase();
+            if (!ALLOWED_TABLES.includes(tableName)) {
+                return {
+                    isValid: false,
+                    error: `Table '${tableName}' is not allowed for SELECT operations`,
+                };
+            }
+        }
     }
 
     return { isValid: true };
@@ -84,8 +96,8 @@ export async function POST(request: NextRequest) {
         let queryError = null;
 
         try {
-            // Use parameterized query
-            results = await prisma.$queryRaw`${query}`;
+            // Use $queryRawUnsafe since we've already validated the query
+            results = await prisma.$queryRawUnsafe(query);
         } catch (error: any) {
             queryError = {
                 error: 'SQL execution error',
