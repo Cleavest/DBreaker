@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import master from '@/svg/SQLmaster.svg';
 import SchemaViewer from '@/components/SchemaViewer';
+import { Toaster, toast } from 'sonner';
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
     ssr: false,
@@ -121,6 +122,7 @@ export default function GameLevelPage() {
 
             if (data.isCorrect) {
                 console.log('Correct solution!');
+                toast.success('Correct solution!');
             }
         } catch (error) {
             console.error('Error checking solution:', error);
@@ -186,7 +188,11 @@ export default function GameLevelPage() {
                     {/* Character Section */}
                     <div className="lg:col-span-1 bg-zinc-900 rounded-lg p-6 border border-zinc-800">
                         <div className="flex flex-col items-center">
-                            <Image className='w-[140px] h-full object-cover mb-4' alt="Close Icon" src={master}/>
+                            <Image
+                                className="w-[140px] h-full object-cover mb-4"
+                                alt="Close Icon"
+                                src={master}
+                            />
                             <div className="text-zinc-200 text-center">
                                 <h3 className="text-xl font-bold mb-2">
                                     SQL Master
@@ -198,10 +204,11 @@ export default function GameLevelPage() {
                                     <button
                                         onClick={goToPrevious}
                                         disabled={currentTextIndex === 0}
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${currentTextIndex === 0
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                            currentTextIndex === 0
                                                 ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
                                                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 hover:border-zinc-600'
-                                            }`}
+                                        }`}
                                     >
                                         &larr; Back
                                     </button>
@@ -211,11 +218,12 @@ export default function GameLevelPage() {
                                             currentTextIndex ===
                                             textPages.length - 1
                                         }
-                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${currentTextIndex ===
-                                                textPages.length - 1
+                                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                            currentTextIndex ===
+                                            textPages.length - 1
                                                 ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed'
                                                 : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 hover:border-zinc-600'
-                                            }`}
+                                        }`}
                                     >
                                         Next &rarr;
                                     </button>
