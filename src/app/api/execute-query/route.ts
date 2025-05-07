@@ -126,7 +126,16 @@ export async function POST(request: NextRequest) {
                     .trim()
                     .toLowerCase();
 
-                isCorrect = normalizedQuery === normalizedSolution;
+                // Execute both queries and compare results
+                const userResults = await prisma.$queryRawUnsafe(query);
+                const solutionResults = await prisma.$queryRawUnsafe(
+                    level.sqlQuery
+                );
+
+                // Compare results by converting to JSON strings
+                isCorrect =
+                    JSON.stringify(userResults) ===
+                    JSON.stringify(solutionResults);
 
                 if (!isCorrect && level.hints && level.hints.length > 0) {
                     for (const hint of level.hints) {
