@@ -23,17 +23,17 @@ const SchemaViewer = () => {
                 className="mySwiper"
             >
                 <SwiperSlide className='table-thumb border hover:border-transparent border-zinc-700 hover:cursor-pointer hover:scale-[1.02] active:scale-[0.95] px-8 py-2 text-sm font-bold bg-[rgba(255,255,255,0.05)] hover:bg-[radial-gradient(ellipse_100%_100%_at_100%_80%,rgba(120,79,255,0.3),rgba(255,255,255,0.08))] rounded-xl !w-fit'>
-                    <div>
+                    <div className='text-white'>
                         <span>Student</span>
                     </div>
                 </SwiperSlide>
                 <SwiperSlide className='table-thumb border hover:border-transparent border-zinc-700 hover:cursor-pointer hover:scale-[1.02] active:scale-[0.95] px-8 py-2 text-sm font-bold bg-[rgba(255,255,255,0.05)] hover:bg-[radial-gradient(ellipse_100%_100%_at_100%_80%,rgba(120,79,255,0.3),rgba(255,255,255,0.08))] rounded-xl !w-fit'>
-                    <div>
+                    <div className='text-white'>
                         <span>Course</span>
                     </div>
                 </SwiperSlide>
                 <SwiperSlide className='table-thumb border hover:border-transparent border-zinc-700 hover:cursor-pointer hover:scale-[1.02] active:scale-[0.95] px-8 py-2 text-sm font-bold bg-[rgba(255,255,255,0.05)] hover:bg-[radial-gradient(ellipse_100%_100%_at_100%_80%,rgba(120,79,255,0.3),rgba(255,255,255,0.08))] rounded-xl !w-fit'>
-                    <div>
+                    <div className='text-white'>
                         <span>Grade</span>
                     </div>
                 </SwiperSlide>
