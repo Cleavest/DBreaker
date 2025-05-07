@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
-import master from '@/svg/SQLmaster.svg';
+import master from '@/assets/svg/SQLmaster.svg';
 import SchemaViewer from '@/components/SchemaViewer';
 import { Toaster, toast } from 'sonner';
 
