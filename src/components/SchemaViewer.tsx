@@ -16,7 +16,7 @@ const SchemaViewer = () => {
             <Swiper
                 onSwiper={setThumbsSwiper}
                 spaceBetween={16}
-                slidesPerView={1}
+                slidesPerView={"auto"}
                 freeMode={true}
                 watchSlidesProgress={true}
                 modules={[FreeMode, Navigation, Thumbs]}
