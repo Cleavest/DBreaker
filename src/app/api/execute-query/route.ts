@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { Parser } from 'node-sql-parser';
- import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 const parser = new Parser();
- 
+
 // Allowed tables for SELECT operations
 const ALLOWED_TABLES = ['course', 'grade', 'student'];
- 
+
 interface SelectAST {
     type: 'select';
     from: Array<{ table: string }> | { table: string };
 }
- 
+
 function validateSelectQuery(query: string): {
     isValid: boolean;
     error?: string;
@@ -22,12 +22,12 @@ function validateSelectQuery(query: string): {
     try {
         // Parse the SQL query
         const ast = parser.astify(query) as SelectAST;
- 
+
         // Check if it's a SELECT query
         if (ast.type !== 'select') {
             return { isValid: false, error: 'Only SELECT queries are allowed' };
         }
- 
+
         // Check for dangerous patterns
         const dangerousPatterns = [
             'DROP',
@@ -43,7 +43,7 @@ function validateSelectQuery(query: string): {
             'UPDATE',
             'DELETE',
         ];
- 
+
         const upperQuery = query.toUpperCase();
         for (const pattern of dangerousPatterns) {
             if (upperQuery.includes(pattern)) {
@@ -53,7 +53,7 @@ function validateSelectQuery(query: string): {
                 };
             }
         }
- 
+
         // Check tables in FROM clause
         if (ast.from) {
             const tables = Array.isArray(ast.from) ? ast.from : [ast.from];
@@ -67,7 +67,7 @@ function validateSelectQuery(query: string): {
                 }
             }
         }
- 
+
         return { isValid: true };
     } catch (error: any) {
         return {
@@ -76,18 +76,18 @@ function validateSelectQuery(query: string): {
         };
     }
 }
- 
+
 export async function POST(request: NextRequest) {
     try {
         const { query, levelId, hintsCounter } = await request.json();
- 
+
         if (!query) {
             return NextResponse.json(
                 { error: 'No SQL query provided' },
                 { status: 400 }
             );
         }
- 
+
         // Validate that only SELECT queries are allowed
         const validation = validateSelectQuery(query);
         if (!validation.isValid) {
@@ -96,10 +96,10 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
- 
+
         let results;
         let queryError = null;
- 
+
         try {
             // Use $queryRawUnsafe since we've already validated the query
             results = await prisma.$queryRawUnsafe(query);
@@ -109,10 +109,10 @@ export async function POST(request: NextRequest) {
                 message: error.message || 'Error executing SQL query',
             };
         }
- 
+
         let isCorrect = false;
         let hints = [];
- 
+
         if (levelId) {
             const level = await prisma.level.findUnique({
                 where: { id: parseInt(levelId as string) },
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
                     hints: true,
                 },
             });
- 
+
             if (level) {
                 const normalizedQuery = query
                     .replace(/\s+/g, ' ')
@@ -130,18 +130,18 @@ export async function POST(request: NextRequest) {
                     .replace(/\s+/g, ' ')
                     .trim()
                     .toLowerCase();
- 
+
                 // Execute both queries and compare results
                 const userResults = await prisma.$queryRawUnsafe(query);
                 const solutionResults = await prisma.$queryRawUnsafe(
                     level.sqlQuery
                 );
- 
+
                 // Compare results by converting to JSON strings
                 isCorrect =
                     JSON.stringify(userResults) ===
                     JSON.stringify(solutionResults);
- 
+
                 if (!isCorrect && level.hints && level.hints.length > 0) {
                     for (const hint of level.hints) {
                         if (
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
                 }
             }
         }
- 
+
         if (queryError) {
             return NextResponse.json(
                 {
@@ -181,6 +181,17 @@ export async function POST(request: NextRequest) {
 
             if (user && user.currentLevelId == levelId) {
                 const score = hintsCounter > 2 ? 1 : 3 - hintsCounter;
+
+                if (user?.currentLevelId) {
+                    await prisma.levelProgress.create({
+                        data: {
+                            userId: user.id,
+                            level: user?.currentLevelId,
+                            score: score,
+                        },
+                    });
+                }
+
                 await prisma.user.update({
                     where: { id: user.id },
                     data: {
@@ -194,7 +205,7 @@ export async function POST(request: NextRequest) {
                 });
             }
         }
- 
+
         return NextResponse.json({
             results: Array.isArray(results) ? results : [results],
             isCorrect,
@@ -202,7 +213,7 @@ export async function POST(request: NextRequest) {
         });
     } catch (error: any) {
         console.error('Error executing query:', error);
- 
+
         // Check for specific database errors
         if (error.code === 'P2002') {
             return NextResponse.json(
@@ -213,7 +224,7 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
- 
+
         if (error.code === 'P2025') {
             return NextResponse.json(
                 {
@@ -223,7 +234,7 @@ export async function POST(request: NextRequest) {
                 { status: 404 }
             );
         }
- 
+
         // Check for SQL syntax errors
         if (error.message && error.message.includes('syntax error')) {
             return NextResponse.json(
@@ -231,7 +242,7 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
- 
+
         // Check for table/column not found errors
         if (
             error.message &&
@@ -244,7 +255,7 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
- 
+
         return NextResponse.json(
             {
                 error: 'Database Error',

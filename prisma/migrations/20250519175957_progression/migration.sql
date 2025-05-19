@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE "LevelProgress" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "userId" TEXT NOT NULL,
+    "score" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "LevelProgress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

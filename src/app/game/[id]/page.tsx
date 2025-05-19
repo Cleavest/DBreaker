@@ -106,7 +106,6 @@ export default function GameLevelPage() {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Error executing query:', errorData);
 
                 if (errorData.hints && errorData.hints.length > 0) {
                     setHints(errorData.hints);
@@ -114,7 +113,7 @@ export default function GameLevelPage() {
                 }
 
                 setQueryResults([
-                    { error: errorData.message },
+                    { error: errorData.error },
                 ]);
                 return;
             }

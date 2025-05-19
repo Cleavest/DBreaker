@@ -41,7 +41,7 @@ export default function LoginPage() {
     return (
         <>
             <section className='relative mb-20 conatiner mx-auto'>
-                <Image className='w-full h-[400px] lg:h-[500px] object-cover' alt="Image of Server" src={image} />
+                <Image className='w-full h-[400px] lg:h-[500px] object-cover' alt="Image of Login page" src={image} />
                 <div className="absolute backdrop-blur-[5px] h-full inset-0 bg-[rgba(16,10,35,0.4)]"></div>
                 <div className='container px-4 text-center flex flex-col items-center justify-center gap-4 absolute inset-0 mx-auto'>
                     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-200 mt-14">

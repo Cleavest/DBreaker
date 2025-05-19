@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
-  seed = "node prisma/seed.js"
+  seed            = "node prisma/seed.js"
 }
 
 datasource db {
@@ -10,22 +10,31 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String
-  currentLevel  Level?    @relation(fields: [currentLevelId], references: [id])
-  currentLevelId Int?     @default(1)
-  score         Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  password       String
+  currentLevel   Level?          @relation(fields: [currentLevelId], references: [id])
+  currentLevelId Int            @default(1)
+  score          Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  LevelProgress  LevelProgress[]
+}
+
+model LevelProgress {
+  id     Int    @id @default(autoincrement())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  score  Int    @default(0)
+  level  Int
 }
 
 model Level {
   id          Int      @id @default(autoincrement())
   name        String
-  description String   // Descriptions stored as string separated by "|||"
-  sqlQuery    String   // The SQL query needed to complete the level
+  description String // Descriptions stored as string separated by "|||"
+  sqlQuery    String // The SQL query needed to complete the level
   hints       Hint[]
   users       User[]
   createdAt   DateTime @default(now())
@@ -33,49 +42,49 @@ model Level {
 }
 
 model Hint {
-  id          Int      @id @default(autoincrement())
-  levelId     Int
-  level       Level    @relation(fields: [levelId], references: [id])
-  pattern     String
-  basicHint   String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  levelId   Int
+  level     Level    @relation(fields: [levelId], references: [id])
+  pattern   String
+  basicHint String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Student {
-  id          Int       @id @default(autoincrement())
-  studentId   String    @unique
-  firstName   String
-  lastName    String
-  email       String    @unique
+  id             Int      @id @default(autoincrement())
+  studentId      String   @unique
+  firstName      String
+  lastName       String
+  email          String   @unique
   enrollmentYear Int
-  grades      Grade[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  grades         Grade[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Course {
-  id          Int       @id @default(autoincrement())
-  courseCode  String    @unique
-  title       String
-  department  String
-  credits     Int
-  grades      Grade[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         Int      @id @default(autoincrement())
+  courseCode String   @unique
+  title      String
+  department String
+  credits    Int
+  grades     Grade[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Grade {
-  id          Int       @id @default(autoincrement())
-  student     Student   @relation(fields: [studentId], references: [id])
-  studentId   Int
-  course      Course    @relation(fields: [courseId], references: [id])
-  courseId    Int
-  grade       Float
-  semester    String
+  id           Int      @id @default(autoincrement())
+  student      Student  @relation(fields: [studentId], references: [id])
+  studentId    Int
+  course       Course   @relation(fields: [courseId], references: [id])
+  courseId     Int
+  grade        Float
+  semester     String
   academicYear String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@unique([studentId, courseId, academicYear, semester])
-} 
+}
