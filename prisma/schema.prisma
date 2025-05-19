@@ -15,7 +15,7 @@ model User {
   email         String    @unique
   password      String
   currentLevel  Level?    @relation(fields: [currentLevelId], references: [id])
-  currentLevelId Int?
+  currentLevelId Int?     @default(1)
   score         Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

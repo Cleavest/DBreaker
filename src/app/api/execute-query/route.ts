@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -74,7 +76,7 @@ function validateSelectQuery(query: string): {
 
 export async function POST(request: NextRequest) {
     try {
-        const { query, levelId } = await request.json();
+        const { query, levelId, hintsCounter } = await request.json();
 
         if (!query) {
             return NextResponse.json(
@@ -154,6 +156,31 @@ export async function POST(request: NextRequest) {
                 },
                 { status: 422 }
             );
+        }
+
+        if (isCorrect) {
+            const session = await getServerSession(authOptions);
+
+            const user = await prisma.user.findUnique({
+                where: {
+                    email: session?.user?.email ?? undefined,
+                },
+            });
+
+            if (user && user.currentLevelId == levelId) {
+                const score = hintsCounter > 2 ? 1 : 3 - hintsCounter;
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: {
+                        currentLevelId: {
+                            increment: 1,
+                        },
+                        score: {
+                            increment: score,
+                        }
+                    },
+                });
+            }
         }
 
         return NextResponse.json({

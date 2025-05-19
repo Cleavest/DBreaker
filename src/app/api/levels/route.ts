@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -19,7 +21,20 @@ export async function GET() {
                 level.id <= 2 ? 'Easy' : level.id <= 4 ? 'Medium' : 'Hard',
         }));
 
-        return NextResponse.json(levelsWithDifficulty);
+        const session = await getServerSession(authOptions);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: session?.user?.email ?? undefined,
+            },
+        });
+
+        let result = {
+            levels: levelsWithDifficulty,
+            level: user?.currentLevelId
+        }
+
+        return NextResponse.json(result);
     } catch (error) {
         console.error('Error fetching levels:', error);
         return NextResponse.json(
