@@ -114,7 +114,7 @@ export default function GameLevelPage() {
                 }
 
                 setQueryResults([
-                    { error: errorData.message || 'Error executing query' },
+                    { error: errorData.message },
                 ]);
                 return;
             }
