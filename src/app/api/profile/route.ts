@@ -7,22 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
     try {
-        const leaderboard = await prisma.user.findMany({
-            where: {
-                score: {
-                    gt: 0,
-                },
-            },
-            orderBy: {
-                score: 'desc',
-            },
-            take: 10,
-            select: {
-                name: true,
-                score: true,
-                id: true
-            },
-        });
+
 
         const session = await getServerSession(authOptions);
 
@@ -32,10 +17,22 @@ export async function GET() {
             },
         });
 
-        let result = {
-            leaderboard : leaderboard,
-            user: user?.id
-        }
+        const result = await prisma.user.findUnique({
+            where: { id: user?.id },
+            select: {
+                id: true,
+                score: true,
+                createdAt: true,
+                currentLevelId: true,
+                email: true,
+                name: true,
+                LevelProgress: {
+                    orderBy: { level: 'asc' },
+                },
+            },
+        });
+
+
 
         return NextResponse.json(result);
     } catch (error) {

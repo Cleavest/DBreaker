@@ -10,12 +10,14 @@ import image_db from '@/assets/images/serrver.jpg'
 interface Leader {
     name: string,
     score: number
+    id: string
 }
 
 export default function LeaderBoard() {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [loading, setLoading] = useState(false);
+    const [userID, setID] = useState("");
     const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
 
     useEffect(() => {
@@ -38,7 +40,8 @@ export default function LeaderBoard() {
                     }
 
                     const data = await response.json();
-                    setLeaderboard(data);
+                    setLeaderboard(data.leaderboard);
+                    setID(data.user);
                     setLoading(false);
                 } catch (error) {
                     console.error('Error fetching LeaderBoard:', error);
@@ -80,16 +83,20 @@ export default function LeaderBoard() {
                             else if (index === 1) bgColor = 'bg-gray-300 text-black';
                             else if (index === 2) bgColor = 'bg-amber-900 text-white';
 
-                            // const rowBg = index % 2 === 0 ? 'bg-zinc-700' : 'bg-zinc-800';
+                            var active = false;
+
+                            if(leader.id == userID){
+                                active = true;
+                            }
 
                             return (
-                                <li key={index} className={`w-full px-4 py-2 rounded-2xl`}>
+                                <li key={index} className={`w-full ${active && 'shadow-[0_5px_5px_rgba(255,255,255,0.2)]'} px-4 py-2 rounded-2xl`}>
                                     <div className="flex flex-row gap-4 items-center justify-between text-2xl">
                                         <div className="flex flex-row items-center gap-4 sm:gap-12 lg:gap-20">
                                             <span className={`py-2 px-4 rounded-xl ${bgColor}`}>
                                                 {index + 1}
                                             </span>
-                                            <span className='font-semibold'>{leader.name}</span>
+                                            <span className={`${active ? 'font-black text-emerald-500/80' : 'font-semibold'}`}>{leader.name}</span>
                                         </div>
                                         <div className='flex flex-row gap-2 items-center'>
                                             <span className='font-black'>{leader.score}</span>
