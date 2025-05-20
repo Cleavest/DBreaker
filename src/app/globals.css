@@ -30,28 +30,6 @@ body {
     @apply pointer-events-none bg-[radial-gradient(ellipse_100%_100%_at_-20%_0%,rgba(120,79,255,0.3),rgba(9,9,11,0.8))];
 }
 
-.leaderboard{
-    table{
-        @apply w-full;
-
-        caption{
-            @apply text-2xl font-bold;
-        }
-
-        th{
-            @apply text-xl p-4 text-zinc-300;
-
-            &:first-child{
-                @apply !w-fit;
-            }
-        }
-
-        td{
-            @apply p-4 text-lg text-center !border-none;
-
-            &:first-child{
-                @apply !w-fit p-1 bg-zinc-500;
-            }
-        }
-    }
+.transform-center{
+    transform: translate(-50%, -50%);
 }
