@@ -80,7 +80,7 @@ export default function Profile() {
     return (
         <>
             <div className="relative mb-10 lg:mb-20">
-                <h2 className='text-center text-nowrap transform-center left-[50%] z-10 top-[30%] text-lg lg:text-4xl font-bold w-fit h-fit absolute px-4'>Profile</h2>
+                <h2 className='text-center text-nowrap transform-center left-[50%] z-10 top-[30%] text-lg lg:text-4xl font-bold w-fit h-fit absolute px-4 text-white'>Profile</h2>
                 <svg className="w-full drop-shadow-[0_18px_10px_rgba(0,0,0,0.4)]" viewBox="0 0 1440 220" preserveAspectRatio="none">
                     <path fill="#27272a" d="M0,160 C360,280 1080,40 1440,160 L1440,0 L0,0 Z"></path>
                 </svg>
@@ -88,7 +88,7 @@ export default function Profile() {
 
             <section className='container px-4 mx-auto'>
                 <div className='w-full flex flex-col lg:flex-row gap-4 justify-between'>
-                    <div className='bg-zinc-800 rounded-3xl p-6 lg:p-8 space-y-2 h-fit'>
+                    <div className='bg-zinc-800 text-white rounded-3xl p-6 lg:p-8 space-y-2 h-fit'>
                         <div className='flex flex-row gap-4 items-center'>
                             <div className='p-4 rounded-full bg-[radial-gradient(ellipse_100%_100%_at_0%_0%,rgba(120,79,255,0.8),rgba(255,255,255,0.08))]'>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 lg:size-10">
@@ -109,7 +109,7 @@ export default function Profile() {
                         </div>
                     </div>
 
-                    <div className='bg-zinc-800 rounded-3xl p-4 lg:p-8 w-full h-full'>
+                    <div className='bg-zinc-800 text-white rounded-3xl p-4 lg:p-8 w-full h-full'>
                         <h4 className='text-xl px-4 py-2 font-bold text-zinc-200'>Level Progress</h4>
                         <ul className="space-y-6">
                             {user?.LevelProgress.map((level, index) => {

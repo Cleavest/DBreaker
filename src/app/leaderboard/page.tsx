@@ -68,13 +68,13 @@ export default function LeaderBoard() {
     return (
         <>
             <div className="relative mb-10 lg:mb-20">
-                <h3 className='text-center text-nowrap transform-center left-[50%] z-10 top-[30%] text-lg lg:text-4xl font-bold w-fit h-fit absolute px-4'>Top 10 Leaderboard</h3>
+                <h3 className='text-center text-nowrap transform-center left-[50%] z-10 top-[30%] text-lg lg:text-4xl font-bold w-fit h-fit absolute px-4 text-white'>Top 10 Leaderboard</h3>
                 <svg className="w-full drop-shadow-[0_18px_10px_rgba(0,0,0,0.4)]" viewBox="0 0 1440 220" preserveAspectRatio="none">
                     <path fill="#27272a" d="M0,160 C360,280 1080,40 1440,160 L1440,0 L0,0 Z"></path>
                 </svg>
             </div>
             <section className='container mx-auto px-4 leaderboard'>
-                <div className='rounded-3xl p-6 lg:p-8 bg-zinc-900 mx-auto w-full space-y-8 sm:w-[70%] lg:w-[50%]'>
+                <div className='rounded-3xl p-6 lg:p-8 bg-zinc-900 mx-auto text-white w-full space-y-8 sm:w-[70%] lg:w-[50%]'>
                     <ul className="space-y-6">
                         {leaderboard.map((leader, index) => {
                             let bgColor = 'bg-zinc-700';
