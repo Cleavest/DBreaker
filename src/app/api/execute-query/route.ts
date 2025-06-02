@@ -1,75 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { Parser } from 'node-sql-parser';
 
 const prisma = new PrismaClient();
+const parser = new Parser();
 
 // Allowed tables for SELECT operations
 const ALLOWED_TABLES = ['course', 'grade', 'student'];
+
+interface SelectAST {
+    type: 'select';
+    from: Array<{ table: string }> | { table: string };
+}
 
 function validateSelectQuery(query: string): {
     isValid: boolean;
     error?: string;
 } {
-    // Convert to uppercase for case-insensitive comparison
-    const upperQuery = query.toUpperCase().trim();
+    try {
+        // Parse the SQL query
+        const ast = parser.astify(query) as SelectAST;
 
-    // Check if query starts with SELECT
-    if (!upperQuery.startsWith('SELECT')) {
-        return { isValid: false, error: 'Only SELECT queries are allowed' };
-    }
-
-    // Check for dangerous patterns
-    const dangerousPatterns = [
-        'DROP',
-        'TRUNCATE',
-        'ALTER',
-        'CREATE',
-        'EXEC',
-        'UNION',
-        '--',
-        ';',
-        '/*',
-        'INSERT',
-        'UPDATE',
-        'DELETE',
-    ];
-
-    for (const pattern of dangerousPatterns) {
-        if (upperQuery.includes(pattern)) {
-            return {
-                isValid: false,
-                error: 'Query contains potentially dangerous patterns',
-            };
+        // Check if it's a SELECT query
+        if (ast.type !== 'select') {
+            return { isValid: false, error: 'Only SELECT queries are allowed' };
         }
-    }
 
-    // Extract all table names from the query
-    const tableMatches = upperQuery.match(
-        /FROM\s+(\w+)(?:\s+(?:AS\s+\w+)?(?:\s*,\s*(\w+)(?:\s+(?:AS\s+\w+)?)?)*)?/g
-    );
-    if (!tableMatches) {
-        return { isValid: false, error: 'Invalid SELECT query format' };
-    }
+        // Check for dangerous patterns
+        const dangerousPatterns = [
+            'DROP',
+            'TRUNCATE',
+            'ALTER',
+            'CREATE',
+            'EXEC',
+            'UNION',
+            '--',
+            ';',
+            '/*',
+            'INSERT',
+            'UPDATE',
+            'DELETE',
+        ];
 
-    // Check each table in the query
-    for (const match of tableMatches) {
-        const tables = match
-            .replace('FROM', '')
-            .trim()
-            .split(/\s*,\s*/);
-        for (const table of tables) {
-            // Remove any alias
-            const tableName = table.split(/\s+/)[0].toLowerCase();
-            if (!ALLOWED_TABLES.includes(tableName)) {
+        const upperQuery = query.toUpperCase();
+        for (const pattern of dangerousPatterns) {
+            if (upperQuery.includes(pattern)) {
                 return {
                     isValid: false,
-                    error: `Table '${tableName}' is not allowed for SELECT operations`,
+                    error: 'Query contains potentially dangerous patterns',
                 };
             }
         }
-    }
 
-    return { isValid: true };
+        // Check tables in FROM clause
+        if (ast.from) {
+            const tables = Array.isArray(ast.from) ? ast.from : [ast.from];
+            for (const table of tables) {
+                const tableName = table.table.toLowerCase();
+                if (!ALLOWED_TABLES.includes(tableName)) {
+                    return {
+                        isValid: false,
+                        error: `Table '${tableName}' is not allowed for SELECT operations`,
+                    };
+                }
+            }
+        }
+
+        return { isValid: true };
+    } catch (error: any) {
+        return {
+            isValid: false,
+            error: `SQL Syntax Error: ${error.message}`,
+        };
+    }
 }
 
 export async function POST(request: NextRequest) {
@@ -170,10 +173,56 @@ export async function POST(request: NextRequest) {
             isCorrect,
             hints: !isCorrect && hints.length > 0 ? hints : undefined,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error executing query:', error);
+
+        // Check for specific database errors
+        if (error.code === 'P2002') {
+            return NextResponse.json(
+                {
+                    error: 'Unique constraint violation',
+                    message: 'This record already exists',
+                },
+                { status: 400 }
+            );
+        }
+
+        if (error.code === 'P2025') {
+            return NextResponse.json(
+                {
+                    error: 'Record not found',
+                    message: 'The requested record does not exist',
+                },
+                { status: 404 }
+            );
+        }
+
+        // Check for SQL syntax errors
+        if (error.message && error.message.includes('syntax error')) {
+            return NextResponse.json(
+                { error: 'SQL Syntax Error', message: error.message },
+                { status: 400 }
+            );
+        }
+
+        // Check for table/column not found errors
+        if (
+            error.message &&
+            (error.message.includes('relation') ||
+                error.message.includes('column') ||
+                error.message.includes('does not exist'))
+        ) {
+            return NextResponse.json(
+                { error: 'Database Object Error', message: error.message },
+                { status: 400 }
+            );
+        }
+
         return NextResponse.json(
-            { error: 'Failed to execute query' },
+            {
+                error: 'Database Error',
+                message: error.message || 'An unexpected error occurred',
+            },
             { status: 500 }
         );
     }

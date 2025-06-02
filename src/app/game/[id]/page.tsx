@@ -106,9 +106,7 @@ export default function GameLevelPage() {
                     setHints(errorData.hints);
                 }
 
-                setQueryResults([
-                    { error: errorData.message || 'Error executing query' },
-                ]);
+                setQueryResults([{ error: errorData.error }]);
                 return;
             }
 
