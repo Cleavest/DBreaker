@@ -7,19 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
     try {
-        const levels = await prisma.level.findMany({
-            select: {
-                id: true,
-                name: true,
-                createdAt: true,
-            },
-        });
 
-        const levelsWithDifficulty = levels.map((level) => ({
-            ...level,
-            difficulty:
-                level.id <= 2 ? 'Easy' : level.id <= 4 ? 'Medium' : 'Hard',
-        }));
 
         const session = await getServerSession(authOptions);
 
@@ -29,16 +17,28 @@ export async function GET() {
             },
         });
 
-        let result = {
-            levels: levelsWithDifficulty,
-            level: user?.currentLevelId
-        }
+        const result = await prisma.user.findUnique({
+            where: { id: user?.id },
+            select: {
+                id: true,
+                score: true,
+                createdAt: true,
+                currentLevelId: true,
+                email: true,
+                name: true,
+                LevelProgress: {
+                    orderBy: { level: 'asc' },
+                },
+            },
+        });
+
+
 
         return NextResponse.json(result);
     } catch (error) {
-        console.error('Error fetching levels:', error);
+        console.error('Error fetching Users:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch levels' },
+            { error: 'Failed to fetch Users' },
             { status: 500 }
         );
     }

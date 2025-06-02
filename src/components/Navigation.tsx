@@ -27,6 +27,18 @@ export default function Navigation() {
                                 >
                                     Game
                                 </Link>
+                                <Link
+                                    href="/profile"
+                                    className="text-zinc-300 hover:text-zinc-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    Profile
+                                </Link>
+                                <Link
+                                    href="/leaderboard"
+                                    className="text-zinc-300 hover:text-zinc-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                                >
+                                    Leaderboard
+                                </Link>
                             </div>
                         )}
                     </div>

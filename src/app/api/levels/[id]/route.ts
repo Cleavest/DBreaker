@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -26,6 +28,28 @@ export async function GET(request: NextRequest) {
             return NextResponse.json(
                 { error: 'Level not found' },
                 { status: 404 }
+            );
+        }
+
+        const session = await getServerSession(authOptions);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: session?.user?.email ?? undefined,
+            },
+        });
+
+        if (user) {
+            if (user.currentLevelId != levelId) {
+                return NextResponse.json(
+                    { error: 'Access Denied' },
+                    { status: 500 }
+                );
+            }
+        } else {
+            return NextResponse.json(
+                { error: 'Failed to fetch User' },
+                { status: 500 }
             );
         }
 
